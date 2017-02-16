@@ -2,7 +2,7 @@
 
 A Raspberry Pi / ARMv7 compatible Docker image with Prometheus and Cross-build support
 
-Tested with a Raspberry Pi 3
+Tested with a Raspberry Pi 3. SSH into the pi then follow the process below.
 
 ## Install Docker
 ```
