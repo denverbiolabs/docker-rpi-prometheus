@@ -3,8 +3,6 @@ FROM resin/armv7hf-debian-qemu
 ENV DEBIAN_FRONTEND noninteractive
 ENV PROMETHEUS_VERSION 1.1.3
 
-RUN [ "cross-build-start" ]
-
 RUN apt-get update && \
     apt-get install -yq \
             curl
@@ -14,12 +12,14 @@ RUN curl -Ls https://github.com/prometheus/prometheus/releases/download/v$PROMET
     mkdir -p /etc/prometheus && \
     mv prometheus /bin/prometheus && \
     mv promtool /bin/promtool && \
-    mv prometheus.yml /etc/prometheus/prometheus.yml && \
+    # mv prometheus.yml /etc/prometheus/prometheus.yml && \
     mv console_libraries /etc/prometheus/ && \
     mv consoles /etc/prometheus/ && \
     cd /tmp && rm -rf prometheus-$PROMETHEUS_VERSION.linux-armv7
 
-RUN [ "cross-build-end" ]
+COPY prometheus.yml /etc/prometheus/prometheus.yml
+COPY app/app.py /opt/app.py
+RUN /usr/bin/python /opt/app.py
 
 EXPOSE     9090
 VOLUME     [ "/prometheus" ]
