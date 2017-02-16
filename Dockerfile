@@ -22,7 +22,9 @@ COPY prometheus.yml /etc/prometheus/prometheus.yml
 COPY app/app.py /opt/app.py
 COPY requirements.txt /tmp/requirements.txt
 
-RUN pip install -f /tmp/requirements.txt
+RUN apt-get install -f python-pip python-dev build-essential\
+  /usr/bin/pip install --upgrade pip\
+  /usr/bin/pip install -f /tmp/requirements.txt
 RUN /usr/bin/python /opt/app.py
 
 EXPOSE     9090
