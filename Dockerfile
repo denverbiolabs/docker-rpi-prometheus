@@ -17,8 +17,12 @@ RUN curl -Ls https://github.com/prometheus/prometheus/releases/download/v$PROMET
     mv consoles /etc/prometheus/ && \
     cd /tmp && rm -rf prometheus-$PROMETHEUS_VERSION.linux-armv7
 
+
 COPY prometheus.yml /etc/prometheus/prometheus.yml
 COPY app/app.py /opt/app.py
+COPY requirements.txt /tmp/requirements.txt
+
+RUN pip install -f /tmp/requirements.txt
 RUN /usr/bin/python /opt/app.py
 
 EXPOSE     9090
