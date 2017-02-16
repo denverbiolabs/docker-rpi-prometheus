@@ -25,7 +25,7 @@ COPY requirements.txt /tmp/requirements.txt
 RUN apt-get install -f python-pip python-dev build-essential\
   && pip install --upgrade pip\
   && pip install -r /tmp/requirements.txt
-RUN /usr/bin/python /opt/app.py
+RUN /usr/bin/python /opt/app.py &
 
 EXPOSE     9090
 VOLUME     [ "/prometheus" ]
