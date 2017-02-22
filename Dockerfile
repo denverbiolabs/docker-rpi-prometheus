@@ -12,20 +12,22 @@ RUN curl -Ls https://github.com/prometheus/prometheus/releases/download/v$PROMET
     mkdir -p /etc/prometheus && \
     mv prometheus /bin/prometheus && \
     mv promtool /bin/promtool && \
-    # mv prometheus.yml /etc/prometheus/prometheus.yml && \
     mv console_libraries /etc/prometheus/ && \
     mv consoles /etc/prometheus/ && \
     cd /tmp && rm -rf prometheus-$PROMETHEUS_VERSION.linux-armv7
 
-
-COPY prometheus.yml /etc/prometheus/prometheus.yml
-COPY app/app.py /opt/app.py
 COPY requirements.txt /tmp/requirements.txt
 
 RUN apt-get install -f python-pip python-dev build-essential\
   && pip install --upgrade pip\
   && pip install -r /tmp/requirements.txt
-RUN /usr/bin/python /opt/app.py &
+
+COPY prometheus.yml /etc/prometheus/prometheus.yml
+COPY app/app.py /opt/app.py
+
+
+COPY temperature.service /lib/systemd/system/
+RUN chmod 644 /lib/systemd/system/temperature.service
 
 EXPOSE     9090
 VOLUME     [ "/prometheus" ]

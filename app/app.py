@@ -1,29 +1,52 @@
-from prometheus_client import start_http_server, Summary, Gauge
+from prometheus_client import start_http_server, Gauge
 import random
 import time
+import os
+
+
+ds18b20 = ''
+
+def setup():
+    global ds18b20
+    for i in os.listdir('/sys/bus/w1/devices'):
+        if i != 'w1_bus_master1':
+            ds18b20 = i
+
+def read():
+    global ds18b20
+    location = '/sys/bus/w1/devices/' + ds18b20 + '/w1_slave'
+    tfile = open(location)
+    text = tfile.read()
+    tfile.close()
+    secondline = text.split("\n")[1]
+    temperaturedata = secondline.split(" ")[9]
+    temperature = float(temperaturedata[2:])
+    temperature = temperature / 1000
+    return temperature
+        
+def loop():
+    while True:
+        if read() != None:
+            temp = read()
+            handle_temp(temp)
+            print "Current temperature : %0.3f C" % temp
+
+def destroy():
+    pass
 
 
 # Create a metric to track time spent and requests made.
-REQUEST_TIME = Summary('request_processing_seconds', 'Time spent processing request')
-g = Gauge('fridge_temperature', 'Temperatur of the fridge')
+g = Gauge('fridge_temperature', 'Temperature of the fridge')
 
-# Decorate function with metric.
-@REQUEST_TIME.time()
-def process_request(t):
-    """A dummy function that takes some time."""
-    time.sleep(t)
 
-def count(t):
-  g.inc()
-  time.sleep(t)
-  
+def handle_temp(t):
+    g.set(t)
 
 if __name__ == '__main__':
-    # Start up the server to expose the metrics.
-    start_http_server(8000)
-    # Generate some requests.
-    while True:
-        r = random.random()
-        process_request(r)
-        count(r)
+    try:
+        start_http_server(8000)
+        setup()
+        loop()
+    except KeyboardInterrupt:
+        destroy()
 

@@ -1,0 +1,11 @@
+[Unit]
+Description=Python temperature sensing
+After=multi-user.target
+
+[Service]
+Type=idle
+ExecStart=/usr/bin/python /opt/app.py
+
+[Install]
+WantedBy=multi-user.target
+
